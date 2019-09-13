@@ -1,7 +1,7 @@
 from deap import tools
 import random
 
-def varOr(population, toolbox, lambda_, cxpb, mutpb):
+def varOr(population, toolbox, lambda_, cxpb, mutpb):   # Make 1 GA step
     assert (cxpb + mutpb) <= 1.0, (
         "The sum of the crossover and mutation probabilities must be smaller "
         "or equal to 1.0.")
@@ -26,6 +26,13 @@ def varOr(population, toolbox, lambda_, cxpb, mutpb):
     return offspring
 
 
+# population - population
+# toolbox - (temporary population)
+# mu - change the new selected population == population.size
+# lambda_ == population.size
+# cspb, mutpb - crossover and mutation probabilities
+# lambda_, cxpb, mutpb - needed for iteration ("varOr()")
+# ngen - number of iterations
 def eaMuPlusLambda(population, toolbox, mu, lambda_, cxpb, mutpb, ngen,
                    stats=None, halloffame=None, verbose=__debug__):
     logbook = tools.Logbook()

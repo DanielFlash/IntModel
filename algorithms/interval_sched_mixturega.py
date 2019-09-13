@@ -72,14 +72,14 @@ class IntervalMixtureSchedGA:
         toolbox.register("mate", self.crossover)
         toolbox.register("mutate", self.mutation)
         toolbox.register("select", tools.selTournament, tournsize=3)
-        toolbox.register("evaluate", self.model.evaluate_solution)
-        toolbox.register("savesched", self.write_solution)
-        toolbox.register("plotsolution", self.model.plotsolution)
+        toolbox.register("evaluate", self.model.evaluate_solution)  # Solution to Schedule and simulate
+        toolbox.register("savesched", self.write_solution)  # Save the schedule of the best solution
+        toolbox.register("plotsolution", self.model.plotsolution)   # Solution to Schedule and plot it
 
         self.toolbox = toolbox
 
-    def write_solution(self, best):
-        best_schedule = self.model.solution_to_schedule(best)
+    def write_solution(self, best):  # Save the schedule of the best solution
+        best_schedule = self.model.solution_to_schedule(best)  # Solution to Schedule
         out_schedule = open(self.outpath, 'w')
         for x in range(self.model.x_size):
             for y in range(self.model.y_size):
@@ -118,7 +118,7 @@ def main():
         ammodel = AgentMobilityModel(x_size, y_size, transportations, cores)
         outpath = "..\\tmp\\schedule_output.sched"
         scheduler = IntervalMixtureSchedGA(ammodel, outpath, max_centers=3, ext_sol=None)
-        result = scheduler(iters * 144, (iters + 1) * 144)
+        result = scheduler(iters * 144, (iters + 1) * 144)  # Call "__call__"
         best_solution = result[2].items[0]
         scheduler.write_solution(best_solution)
 
