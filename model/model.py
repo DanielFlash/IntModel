@@ -362,6 +362,8 @@ class AgentMobilityModel:
         plt.show()
 
     def interactive_simulation2_velo_on_kernel(self, schedules, slides=50):  # slides - how often update the plot
+        """ The same simulation, but with some extra code for mapping field zones with kernels.
+        'Core' is the field zone (as it was before); 'Kernel' is the physical kernel in computer"""
         max_value = 39  # For the colormap in plot
         # initialization
         iters = len(self.transportations)
@@ -384,18 +386,18 @@ class AgentMobilityModel:
         cores_total_time = np.zeros((self.cores, 1440))
         cores_velocities = np.zeros((self.cores, 1440))
 
-        new_schedule = False
+        new_schedule = False        # Some flags to track schedule changes
         initial_schedule = True
         schedule_number = 0
 
-        schedule_transfer_time = np.zeros(self.cores)
+        schedule_transfer_time = np.zeros(self.cores)  # Sum of time during the one schedule
         schedule_model_time = np.zeros(self.cores)
         schedule_velocities = np.zeros(self.cores)
         schedule_total_time = np.zeros(self.cores)
 
-        shedule_core_transfers = np.zeros((self.cores, self.cores))
-        kernels_load = np.zeros((self.cores, self.kernels))
-        final_kernels_load = np.zeros((len(schedules), self.kernels))
+        shedule_core_transfers = np.zeros((self.cores, self.cores))  # Need for finding transfers between cores on one kernel
+        kernels_load = np.zeros((self.cores, self.kernels))  # Kernel load
+        final_kernels_load = np.zeros((len(schedules), self.kernels))  # Sum of kernels loads for every schedule
 
         for i in range(0, 1440):
             if i in schedules.keys():       # 0, 144, 288, ..., 1296
@@ -450,10 +452,10 @@ class AgentMobilityModel:
             total_times[i] = total_model_time.max()
             velocities[i] = iter_velocities.max()
 
-            if new_schedule:
-                if initial_schedule:
+            if new_schedule:  # If schedule was changed
+                if initial_schedule:  # If it is the first change, we do not calculate load
                     initial_schedule = False
-                else:
+                else:  # Calculate load
                     print("\nmodel sum on schedule={}".format(schedule_model_time))
                     print("transfer sum on schedule={}".format(schedule_transfer_time))
                     print("total time on schedule={}".format(schedule_total_time))
@@ -463,19 +465,19 @@ class AgentMobilityModel:
                         min = math.inf
                         min_kernel = 0
                         for kernel in range(self.kernels):  # Take each kernel
-                            load = (kernels_load[:, kernel]).sum() + schedule_total_time[core]  # Load
-                            for set_core in range(self.cores):  # Look for cores transfers
+                            load = (kernels_load[:, kernel]).sum() + schedule_total_time[core]  # Overall load
+                            for set_core in range(self.cores):  # Look for cores transfers between chosen core and other on chosen kernel
                                 if kernels_load[set_core, kernel] != 0:
                                     if shedule_core_transfers[core, set_core] != 0:
                                         load -= 2 * shedule_core_transfers[core, set_core] * \
-                                                agent_transfer_time  # Update load
+                                                agent_transfer_time  # Subtract transfer load
                             if min > load:
                                 min = load  # Find min load
                                 min_kernel = kernel  # Find kernel with min load
 
                         kernels_load[core, min_kernel] += schedule_total_time[core]  # Add core on kernel
 
-                        for set_core in range(self.cores):  # Subtract cores transfers
+                        for set_core in range(self.cores):  # Subtract cores transfers load
                             if kernels_load[set_core, min_kernel] != 0:
                                 if shedule_core_transfers[core, set_core] != 0:
                                     kernels_load[core, min_kernel] -= \
@@ -490,7 +492,7 @@ class AgentMobilityModel:
                     schedule_number += 1
                     # input()
 
-                schedule_transfer_time = np.zeros(self.cores)
+                schedule_transfer_time = np.zeros(self.cores)  # Reset to zero our parameters
                 schedule_model_time = np.zeros(self.cores)
                 schedule_velocities = np.zeros(self.cores)
                 schedule_total_time = np.zeros(self.cores)
@@ -498,7 +500,7 @@ class AgentMobilityModel:
                 kernels_load = np.zeros((self.cores, self.kernels))
                 new_schedule = False
 
-            schedule_transfer_time += cores_transfers
+            schedule_transfer_time += cores_transfers  # Add loads
             schedule_model_time += cores_model
             schedule_velocities += iter_velocities
             schedule_total_time += total_model_time
@@ -547,6 +549,7 @@ class AgentMobilityModel:
         plt.tight_layout()
         plt.show()
 
+        # Output the kernels load:
         print("final kernels load=\n{}".format(final_kernels_load))
 
         plt.figure()
