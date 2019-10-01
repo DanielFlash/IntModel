@@ -363,7 +363,8 @@ class AgentMobilityModel:
 
     def interactive_simulation2_velo_on_kernel(self, schedules, slides=50):  # slides - how often update the plot
         """ The same simulation, but with some extra code for mapping field zones with kernels.
-        'Core' is the field zone (as it was before); 'Kernel' is the physical kernel in computer"""
+        'Core' is the field zone (as it was before); 'Kernel' is the physical kernel in computer.
+        Algorithm: we sum the cores load and map it on kernels for each schedule """
         max_value = 39  # For the colormap in plot
         # initialization
         iters = len(self.transportations)
