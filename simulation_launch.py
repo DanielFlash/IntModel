@@ -1,5 +1,6 @@
 import numpy as np
 from model.model import AgentMobilityModel
+from model.model2 import AgentMobilityModel_2
 
 x_size = 30
 y_size = 30
@@ -47,10 +48,23 @@ def r2m(idx):
     return idx // y_size, idx % y_size  # Return "x" and "y" from number
 
 
-def corresponds_modelling_velo(transportations, schedules, cores, kernels = 0):
+def read_kschedule(ksched_path, partitions):
+    file = open(ksched_path, 'r')
+    ksched = np.zeros(partitions, dtype=np.float)
+    for line in file.readlines():
+        arr = line.split("\t")
+        i = int(arr[0])
+        coef = float(arr[1])
+        ksched[i] = coef
+    file.close()
+    return ksched
+
+
+def corresponds_modelling_velo(transportations, schedules, kschedules, cores, kernels=0):
     if kernels != 0:
-        ammodel = AgentMobilityModel(x_size, y_size, transportations, cores, kernels)
-        ammodel.interactive_simulation2_velo_on_kernel(schedules)
+        ammodel = AgentMobilityModel_2(x_size, y_size, transportations, schedules, cores, kernels)
+        # ammodel.interactive_simulation2_velo_on_kernel2()
+        ammodel.interactive_simulation(kschedules)
     else:
         ammodel = AgentMobilityModel(x_size, y_size, transportations, cores)
         ammodel.interactive_simulation2_velo(schedules)
@@ -61,7 +75,7 @@ def main():
     transportations_file = "resources\\spb_passengers_center_100k_1"
     transportations = read_transportations(transportations_file)
     cores = 9
-    kernels = 5
+    kernels = 50
     schedules = dict()  # Dictionary of 10. Each value - schedule
                         # Each schedule - matrix x on y; each cell - number of core
 
@@ -71,10 +85,18 @@ def main():
             "schedules\\multiple\\10_include\\spb_schedule_velo_{}_{}.sched".format(iters * 144, (iters + 1) * 144))
         schedules[iters * 144] = iter_sched
 
+    kschedules = dict()
+    for iters in range(10):
+        iter_sched = read_kschedule("kernel_schedules\\kernel_{0}_schedule_output_{1}.ksched".format(kernels, iters), cores)
+        kschedules[iters] = iter_sched
+
     # for default case
     # default = read_schedule("schedules\\default")
     # schedules[0] = default
-    corresponds_modelling_velo(transportations, schedules, cores, kernels)
+    corresponds_modelling_velo(transportations, schedules, kschedules, cores, kernels)
 
 if __name__ == "__main__":
     main()
+
+
+    # workflow scheduling
