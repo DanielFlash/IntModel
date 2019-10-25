@@ -1,0 +1,2 @@
+1) pow(x, -0.5) - 18, 50 kernels
+2) 1 - (pow(x, 0.5) / 10) - 100 kernels
