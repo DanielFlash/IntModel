@@ -181,7 +181,7 @@ class IntervalMixtureSchedGA_2:
 def main():
     from simulation_launch import read_transportations, read_schedule
     from model.model2 import AgentMobilityModel_2
-    for iters in range(9, 10):
+    for iters in range(0, 10):
         print("Iter = {}".format(iters))
         # Select input scenario file
         transportations_file = "..\\resources\\spb_passengers_center_100k_1"
@@ -199,9 +199,9 @@ def main():
         x_size = 30
         y_size = 30
         partitions = 9
-        kernels = 50
+        kernels = 100
         ammodel = AgentMobilityModel_2(x_size, y_size, transportations, schedules, partitions, kernels)
-        outpath = "..\\kernel_schedules\\kernel_50_schedule_output_{}.ksched".format(iters)
+        outpath = "..\\kernel_schedules\\one_partition\\kernel_{0}_schedule_2_output_{1}.ksched".format(kernels, iters)
         scheduler = IntervalMixtureSchedGA_2(ammodel, outpath, ext_sol=None)
         result = scheduler(iters * 144, (iters + 1) * 144)  # Call "__call__"
         best_solution = result[2].items[0]

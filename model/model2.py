@@ -31,6 +31,12 @@ class AgentMobilityModel_2:
         self.transportations = transportations
         self.iterations = len(transportations)
         self.schedules = schedules
+        # print(self.schedules.keys())
+        for i in range(len(self.schedules)):
+            self.schedules[i * 144] = self.schedules[2 * 144]
+            # print(self.schedules[i * 144])
+        # print(self.schedules.keys())
+        # input()
         self.partitions = partitions
         self.kernels = kernels
         self.ev_start = 0
@@ -858,7 +864,8 @@ class AgentMobilityModel_2:
             # raise Exception("Partition doesn't have any kernel")
             load_list.append(math.inf)
 
-        return load_list[0] / pow(len(load_list), 0.5), pow(len(load_list), -0.5)
+        # return load_list[0] / pow(len(load_list), 0.5), pow(len(load_list), -0.5)
+        return load_list[0] / pow(len(load_list), 0.5), (1 - (pow(len(load_list), 0.5)/10))
 
 
     def solution_to_schedule(self, solution):

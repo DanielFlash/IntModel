@@ -75,7 +75,7 @@ def main():
     transportations_file = "resources\\spb_passengers_center_100k_1"
     transportations = read_transportations(transportations_file)
     cores = 9
-    kernels = 50
+    kernels = 100
     schedules = dict()  # Dictionary of 10. Each value - schedule
                         # Each schedule - matrix x on y; each cell - number of core
 
@@ -87,7 +87,8 @@ def main():
 
     kschedules = dict()
     for iters in range(10):
-        iter_sched = read_kschedule("kernel_schedules\\kernel_{0}_schedule_output_{1}.ksched".format(kernels, iters), cores)
+        # iter_sched = read_kschedule("kernel_schedules\\one_partition\\kernel_{0}_schedule_2_output_{1}.ksched".format(kernels, iters), cores)
+        iter_sched = read_kschedule("kernel_schedules\\one_partition\\kernel_{0}_schedule_2_output_equal.ksched".format(kernels), cores)
         kschedules[iters] = iter_sched
 
     # for default case
